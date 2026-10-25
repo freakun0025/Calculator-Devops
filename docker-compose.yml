@@ -1,4 +1,5 @@
-version: '3.8'
+# Fixed project name so Jenkins and manual runs manage the same stack
+name: calculator-devops
 
 networks:
   calc-net:
@@ -6,20 +7,26 @@ networks:
 
 services:
   calculator-api:
-    image: calculator-api:latest
+    # Jenkins sets IMAGE_TAG to the build number; defaults to latest for manual runs
+    image: ${DOCKER_IMAGE:-freakun/calculator-api}:${IMAGE_TAG:-latest}
     networks:
       - calc-net
+    expose:
+      - "8080"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-    restart: always
+      - SERVER_PORT=8080
+      - JAVA_TOOL_OPTIONS=-XX:MaxRAMPercentage=75
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 5
+      start_period: 30s
 
   proxy:
-    image: nginx:alpine
+    image: nginx:1.27-alpine
     ports:
       - "80:80"
     networks:
@@ -29,4 +36,9 @@ services:
         condition: service_healthy
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    restart: always
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/nginx-health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3

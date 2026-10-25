@@ -1,4 +1,16 @@
 target/
 .git
 .gitignore
+.gitattributes
+.mvn/
+mvnw
+mvnw.cmd
+.idea/
+.vscode/
+*.iml
+.env
 README.md
+HELP.md
+Jenkinsfile
+docker-compose.yml
+nginx.conf

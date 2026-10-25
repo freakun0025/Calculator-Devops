@@ -47,12 +47,12 @@ pipeline {
     
     post {
         success {
-            mail to: 'kunal.mittal@iiitb.ac.in',
+            mail to: 'mittalkunal0025@gmail.com',
                  subject: "Success: Jenkins Build ${BUILD_NUMBER}",
                  body: "The Calculator API deployed successfully."
         }
         failure {
-            mail to: 'kunal.mittal@iiitb.ac.in',
+            mail to: 'mittalkunal0025@gmail.com',
                  subject: "Failed: Jenkins Build ${BUILD_NUMBER}",
                  body: "The Calculator API build failed. Check Jenkins logs."
         }

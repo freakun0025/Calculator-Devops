@@ -1,0 +1,32 @@
+version: '3.8'
+
+networks:
+  calc-net:
+    driver: bridge
+
+services:
+  calculator-api:
+    image: calculator-api:latest
+    networks:
+      - calc-net
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    restart: always
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  proxy:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    networks:
+      - calc-net
+    depends_on:
+      calculator-api:
+        condition: service_healthy
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    restart: always
